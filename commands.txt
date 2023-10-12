@@ -1,0 +1,2 @@
+List pci capability blocks:
+    sudo lspci -vv -xxx | grep '^.0:00\.2 IOMMU' -A 25
