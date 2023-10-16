@@ -5,6 +5,26 @@ char log_buffer[LOG_SIZE] = {};
 uint64_t vaddrs[N_VADDR] = {};
 size_t idx = 0;
 
+void log_range(uint64_t capability_ptr, uint64_t limit_ptr, int is64) {
+  // log all non zero dwords
+  if (is64) {
+    for(uint64_t i = capability_ptr; i < limit_ptr; i += 8){
+      uint64_t qword = *((uint64_t*)i);
+      if(qword == 0)
+        continue;
+      printk(BUSTER_INFO "%llx: %016llx\n", i - capability_ptr, qword);
+      PRINT_BIN64(qword);
+    }
+  } else {
+    for(uint64_t i = capability_ptr; i < limit_ptr; i += 4){
+      uint32_t dword = *((uint32_t*)i);
+      if(dword == 0)
+        continue;
+      printk(BUSTER_INFO "%llx: %08x\n", i - capability_ptr, dword);
+    }
+  }
+}
+
 
 void* mymalloc(size_t size) {
   void *ptr = kmalloc(size, GFP_KERNEL);
@@ -13,6 +33,39 @@ void* mymalloc(size_t size) {
     return NULL;
   }
   return ptr;
+}
+
+void log_addr(uint64_t addr, uint len){
+  printk(BUSTER_INFO "VA: 0x%016llx\n", addr);
+  if((void*)addr == NULL){
+    printk(BUSTER_INFO "VA: NULL\n");
+    return;
+  }
+  if(len > 256){
+    printk(BUSTER_INFO "len is too big\n");
+    return;
+  }
+
+  for(uint i = 0; i < len; i++){
+    printk(BUSTER_INFO "%x: %08x\n", 4*i, *((uint32_t*)addr + i));
+  }
+}
+
+// gets mapping via ioremap and adds the mapping to vaddrs
+uint64_t get_mapping(uint64_t addr, size_t size){
+  uint64_t ptr;
+  if (idx > N_VADDR) 
+    return 0;
+
+  ptr = (uint64_t) ioremap(addr, size);
+  vaddrs[idx] = ptr;
+  idx++;
+
+  return ptr;
+}
+
+// dumps a page of memory in base 16
+void dump_pg(uint8_t *addr){ 
 }
 
 /* read file operation */
