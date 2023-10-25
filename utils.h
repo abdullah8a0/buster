@@ -1,6 +1,6 @@
-
-
 #pragma once
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -13,6 +13,7 @@
 // open and close files
 #include <linux/pci.h>
 #include <linux/version.h>
+#include <linux/uaccess.h>
 
 #define BUSTER_INFO KERN_INFO "[buster] "
 #define BUSTER_ERR KERN_ERR "[buster] "
@@ -20,6 +21,7 @@
 #define LOG_SIZE 1024
 #define LOG_FILE "buster.log"
 #define LOG_PATH "/sys/kernel/debug/buster/" LOG_FILE
+
 
 // print space every 4 bits
 #define PRINT_BIN64(x) do { \
@@ -42,10 +44,19 @@ extern uint64_t vaddrs[N_VADDR];
 extern size_t idx;
 
 
-void* mymalloc(size_t size);
-void log_range(uint64_t capability_ptr, uint64_t limit_ptr, int is64); 
-void log_addr(uint64_t addr, uint len);
-void dump_pg(uint8_t *addr);
-uint64_t get_mapping(uint64_t addr, size_t size);
+typedef uint64_t u64;
+typedef int64_t i64;
+typedef uint32_t u32;
+typedef int32_t i32;
+typedef uint16_t u16;
+typedef int16_t i16;
+typedef uint8_t u8;
+typedef int8_t i8;
+typedef size_t st;
+
+
+void* mymalloc(st size);
+void log_range(u64 start_ptr, u64 limit_ptr, char* msg);
+u64 get_mapping(u64 addr, st size);
 /* void setup_log(void); */ 
 /* int buster_log(char *msg, int len); */

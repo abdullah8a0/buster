@@ -1,32 +1,93 @@
 #include "utils.h"
+// incl popcount
+#include <linux/bitops.h>
 
 struct dentry *dump_file, *dump_dir;
 char log_buffer[LOG_SIZE] = {};
-uint64_t vaddrs[N_VADDR] = {};
-size_t idx = 0;
+u64 vaddrs[N_VADDR] = {};
+st idx = 0;
+st log_id = 0;
 
-void log_range(uint64_t capability_ptr, uint64_t limit_ptr, int is64) {
-  // log all non zero dwords
-  if (is64) {
-    for(uint64_t i = capability_ptr; i < limit_ptr; i += 8){
-      uint64_t qword = *((uint64_t*)i);
-      if(qword == 0)
-        continue;
-      printk(BUSTER_INFO "%llx: %016llx\n", i - capability_ptr, qword);
-      PRINT_BIN64(qword);
+void log_range(u64 start_ptr, u64 limit_ptr, char *msg) {
+  // prints quad words from start to lim.
+  //
+  // Before printing words, print BEGIN.[ID].[start_ptr].[msg]
+  // After printing everything, print END.[ID]
+  //
+  // format is:
+  // 1x[addr]: [val]
+  //
+  // if there is a repeated quad word k times then:
+  // kx[addr]: [val]
+
+  // check that msg is less than 64 chars and not null and no special chars
+  for (st i = 0; i < 64; i++) {
+    if (msg[i] == '\0') {
+      break;
     }
-  } else {
-    for(uint64_t i = capability_ptr; i < limit_ptr; i += 4){
-      uint32_t dword = *((uint32_t*)i);
-      if(dword == 0)
-        continue;
-      printk(BUSTER_INFO "%llx: %08x\n", i - capability_ptr, dword);
+    if (msg[i] == '\n' || msg[i] == '\r' || msg[i] == '\t') {
+      printk(BUSTER_INFO "err:msg has special chars");
+      return;
+    }
+    if (i == 63) {
+      printk(BUSTER_INFO "err:msg too long");
+      return;
     }
   }
+
+  if (limit_ptr - start_ptr < 8) {
+    printk(BUSTER_INFO "err:limit - start < 8");
+    return;
+  }
+
+  if (start_ptr > limit_ptr) {
+    printk(BUSTER_INFO "err:start > limit");
+    return;
+  }
+
+  if (start_ptr % 8 != 0) {
+    printk(BUSTER_INFO "err:start not aligned");
+    return;
+  }
+
+  u64 prev_val = 0;
+  st count = 0;
+
+  char log_buffer[128] = {0};
+  u64 delta = 0;
+
+  prev_val =  *(u64 *)(start_ptr);
+
+  printk(BUSTER_INFO "BEGIN.%lx.%llx.%s\n", log_id, start_ptr, msg);
+
+  for (u64 *ptr = (u64 *)start_ptr + 1; ptr < (u64 *)limit_ptr; ptr++) {
+    if (*ptr == prev_val) {
+      count++;
+      continue;
+    }
+
+    delta = (u64)ptr - (u64)start_ptr;
+    if (count > 0) {
+      snprintf(log_buffer, 127, "%lxx%llx: %llx\n", count + 1,
+               (delta - 8 * (count + 1)), prev_val);
+      printk(BUSTER_INFO "%s", log_buffer);
+      count = 0;
+    } else {
+      snprintf(log_buffer, 127, "1x%llx: %llx\n", delta - 8, prev_val);
+      printk(BUSTER_INFO "%s", log_buffer);
+    }
+    prev_val = *ptr;
+  }
+
+  snprintf(log_buffer, 127, "%lxx%llx: %llx\n", count + 1,
+           ((u64)limit_ptr - (u64)start_ptr - 8 * (count + 1)), prev_val);
+  printk(BUSTER_INFO "%s", log_buffer);
+
+  printk(BUSTER_INFO "END.%lx\n", log_id);
+  log_id++;
 }
 
-
-void* mymalloc(size_t size) {
+void *mymalloc(st size) {
   void *ptr = kmalloc(size, GFP_KERNEL);
   if (!ptr) {
     printk(BUSTER_ERR "Failed to allocate memory\n");
@@ -35,107 +96,15 @@ void* mymalloc(size_t size) {
   return ptr;
 }
 
-void log_addr(uint64_t addr, uint len){
-  printk(BUSTER_INFO "VA: 0x%016llx\n", addr);
-  if((void*)addr == NULL){
-    printk(BUSTER_INFO "VA: NULL\n");
-    return;
-  }
-  if(len > 256){
-    printk(BUSTER_INFO "len is too big\n");
-    return;
-  }
-
-  for(uint i = 0; i < len; i++){
-    printk(BUSTER_INFO "%x: %08x\n", 4*i, *((uint32_t*)addr + i));
-  }
-}
-
 // gets mapping via ioremap and adds the mapping to vaddrs
-uint64_t get_mapping(uint64_t addr, size_t size){
-  uint64_t ptr;
-  if (idx > N_VADDR) 
+u64 get_mapping(u64 addr, st size) {
+  u64 ptr;
+  if (idx > N_VADDR)
     return 0;
 
-  ptr = (uint64_t) ioremap(addr, size);
+  ptr = (u64)ioremap(addr, size);
   vaddrs[idx] = ptr;
   idx++;
 
   return ptr;
 }
-
-// dumps a page of memory in base 16
-void dump_pg(uint8_t *addr){ 
-}
-
-/* read file operation */
-/* static ssize_t myreader(struct file *fp, char __user *user_buffer, */ 
-/*     size_t count, loff_t *position) */ 
-/* { */ 
-/*    return simple_read_from_buffer(user_buffer, count, position, log_buffer, LOG_SIZE); */
-/* } */ 
-
-/* /1* write file operation *1/ */
-/* static ssize_t mywriter(struct file *fp, const char __user *user_buffer, */ 
-/*     size_t count, loff_t *position) */ 
-/* { */ 
-/*   if(count > LOG_SIZE) */
-/*     return -EINVAL; */ 
-
-/*   return simple_write_to_buffer(log_buffer, LOG_SIZE, position, user_buffer, count); */ 
-/* } */
-
-/* static const struct file_operations my_fops = { */
-/*   .owner = THIS_MODULE, */
-/*   .read = myreader, */
-/*   .write = mywriter, */
-/* }; */
-
-/* void setup_log(void) { */
-/*   dump_dir = debugfs_create_dir("buster", NULL); */
-/*   if (!dump_dir) { */
-/*     printk(BUSTER_ERR "Failed to create debugfs directory\n"); */
-/*     return; */
-/*   } */
-
-/*   dump_file = debugfs_create_file(LOG_FILE, 0644, dump_dir, &log_buffer, NULL); */
-/*   if (!dump_file) { */
-/*     printk(BUSTER_ERR "Failed to create debugfs file\n"); */
-/*   } */
-/* } */
-
-/* int buster_log(char *msg, int len) { */
-/*   int ret; */
-
-/*   if (!dump_file) { */
-/*     setup_log(); */
-  /* } */
-
-  /* if (!dump_file) { */
-  /*   printk(BUSTER_ERR "Failed to create debugfs file\n"); */
-  /*   return -1; */
-  /* } */
-
-  /* if (len > LOG_SIZE) { */
-  /*   printk(BUSTER_ERR "Log message too long\n"); */
-  /*   return -1; */
-  /* } */
-  /* printk(BUSTER_INFO "Log message: %s\n", msg); */
-  /* // write the msg by opening file */
-  /* struct file *fp = filp_open(LOG_FILE, O_WRONLY, 0); */
-  /* printk(BUSTER_INFO "fp = %p\n", fp); */
-  /* if (fp < 0) { */
-  /*   printk(BUSTER_ERR "Failed to open debugfs file\n"); */
-  /*   return -1; */
-  /* } */
-  /* //ssize_t ret = kernel_write(fp, msg, len, 0); */
-  /* ret = 0; */
-  /* if (ret < 0) { */
-  /*   printk(BUSTER_ERR "Failed to write to debugfs file\n"); */
-  /*   return -1; */
-  /* } */
-  /* filp_close(fp, NULL); */
-  /* printk(BUSTER_INFO "Log message written\n"); */
-
-  /* return 0; */
-/* } */

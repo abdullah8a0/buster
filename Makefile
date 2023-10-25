@@ -12,9 +12,5 @@ obj-m += buster.o
 all: 
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 
-comp:
-	gcc -o buster buster.c -Wall -Wextra -Werror -pedantic -std=c99
-
-
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
