@@ -129,8 +129,7 @@ void bust_open(u64 arg1, u64 arg2){
 
   u64 devTblBase_v = (u64)phys_to_virt(devTblBase);
   printk(BUSTER_INFO "devTblBase: 0x%016llx <- 0x%016llx\n", devTblBase_v, devTblBase);
-  /* log_range(devTblBase_v, devTblBase_v + 4096, 256,0); */
-  /* log_range(devTblBase_v + (0xc1 << 7), devTblBase_v + (0xc1 << 7) + 16*128, 256,0); */
+  log_range(devTblBase_v, devTblBase_v + devTblSize, "devTblBase");
 
   u64 comBaseReg = *((u64*)mmio_regs + 1);
   // len = [59:56] // power of 2 increment, 1000 is 256 entries, 4kb
@@ -145,7 +144,24 @@ void bust_open(u64 arg1, u64 arg2){
 
   u64 comTblBase_v = (u64)phys_to_virt(comTblBase);
   printk(BUSTER_INFO "comTblBase_v: 0x%016llx <- 0x%016llx\n", comTblBase_v, comTblBase);
-  /* log_range(comTblBase_v, comTblBase_v + 128, 256,0); */
+  /* log_range(comTblBase_v, comTblBase_v + 4096*4, "COM TBL"); */
+
+
+
+  u64 eventLogBaseReg = *((u64*)mmio_regs + 2);
+  // len = [59:56] // power of 2 increment, 1000 is 256 entries, 4kb
+  // base = [51:12] // 4K aligned,
+
+  u64 eventLogSize = eventLogBaseReg >> 56;
+  eventLogSize = (1 << eventLogSize) * 4096;
+
+  u64 eventLogBase = eventLogBaseReg & ((1ull << 51) - 1);
+
+  printk(BUSTER_INFO "eventLogBaseReg: 0x%016llx\n", eventLogBaseReg);
+  
+  u64 eventLogBase_v = (u64)phys_to_virt(eventLogBase);
+  printk(BUSTER_INFO "eventLogBase_v: 0x%016llx <- 0x%016llx\n", eventLogBase_v, eventLogBase);
+  /* log_range(eventLogBase_v, eventLogBase_v + 4*4096, "EVENT LOG"); */
 }
 
 
