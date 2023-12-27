@@ -6,7 +6,7 @@ import re
 import argparse
 import subprocess
 
-CASCADE_COMMAND = "cd buster; make && { echo \"iommu!!!!!\" | sudo insmod buster.ko} || {echo \"iommu\" | sudo dmesg }> dump/dump-$(date +%d-%H-%M-%S).out"
+CASCADE_COMMAND = "cd buster; make && { echo \"iommu!!!!!\" | sudo -S insmod buster.ko} || {echo \"iommu\" | sudo -S dmesg }> dump/dump-$(date +%d-%H-%M-%S).out"
 
 STDOUT_FILE = "log.txt"
 
