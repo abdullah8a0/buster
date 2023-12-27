@@ -74,15 +74,36 @@ def pull_repo():
 def run_cascade():
     """
     Runs the cascade command and appends the output to log.txt
+    Adds any extra files to the git repo
     """
     is_error = False
     message = ""
     try:
-        message = subprocess.check_output(CASCADE_COMMAND, shell=True)
+        message = subprocess.check_output(CASCADE_COMMAND, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         is_error = True
         message = "Error: an error occurred while running the cascade\n"
         message += str(e.output)
+
+    # check for added files
+    files = subprocess.check_output(["git", "status", "--porcelain"]) 
+    files = files.decode("utf-8")
+    files = files.split("\n")
+    files = [f for f in files if f != ""]
+    files = [f[3:] for f in files]
+    files = [f for f in files if f != STDOUT_FILE]
+    if len(files) > 0:
+        message += "Log: the following files were added to the repo:\n"
+        for f in files:
+            message += f + "\n"
+
+    for f in files:
+        try:
+            subprocess.check_output(["git", "add", f])
+        except subprocess.CalledProcessError as e:
+            is_error = True
+            message += "Error: an error occurred while adding the file " + f + "\n"
+            message += str(e.output)
 
     LOG.write(message)
     if is_error:
