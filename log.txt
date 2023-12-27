@@ -67,3 +67,17 @@ Fast-forward
  1 file changed, 22 insertions(+), 1 deletion(-)
 Error: an error occurred while running the cascade
 b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\n'Exiting...
+--------------------
+Wed Dec 27 06:18:23 PM EST 2023
+--------------------
+Already up to date.
+Error: an error occurred while running the cascade
+b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\nmake[1]: *** /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build: No such file or directory.  Stop.\nmake: *** [Makefile:13: all] Error 2\nsudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper\nsudo: a password is required\n'Log: the following files were added to the repo:
+buster/dump/dump-27-17-51-39.out
+buster/dump/dump-27-17-55-34.out
+buster/dump/dump-27-17-56-33.out
+buster/dump/dump-27-18-00-26.out
+buster/dump/dump-27-18-12-47.out
+buster/dump/dump-27-18-13-26.out
+buster/dump/dump-27-18-18-24.out
+Exiting...
