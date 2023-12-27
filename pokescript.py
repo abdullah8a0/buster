@@ -6,8 +6,7 @@ import re
 import argparse
 import subprocess
 
-CASCADE_COMMAND = "cd buster; make && { echo 'iommu!!!!!' | sudo -S insmod buster.ko} || \
-        {echo 'iommu!!!!!' | sudo -S dmesg }> dump/dump-$(date +%d-%H-%M-%S).out"
+CASCADE_COMMAND = "cd buster || exit; make && { echo 'iommu!!!!!' | sudo -S insmod buster.ko; } || { echo 'iommu!!!!!' | sudo -S dmesg; } > dump/dump-$(date +%d-%H-%M-%S).out"
 
 STDOUT_FILE = "log.txt"
 
@@ -80,7 +79,8 @@ def run_cascade():
     is_error = False
     message = ""
     try:
-        message = subprocess.check_output(CASCADE_COMMAND, shell=True, stderr=subprocess.STDOUT)
+        message = subprocess.check_output(
+            CASCADE_COMMAND, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         is_error = True
         message = "Error: an error occurred while running the cascade\n"
