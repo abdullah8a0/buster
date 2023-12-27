@@ -58,3 +58,12 @@ Wed Dec 27 06:12:46 PM EST 2023
 Already up to date.
 Error: an error occurred while running the cascade
 b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\n'Exiting...
+--------------------
+Wed Dec 27 06:13:26 PM EST 2023
+--------------------
+Updating f3d1611..c6eedf7
+Fast-forward
+ pokescript.py | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+Error: an error occurred while running the cascade
+b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\n'Exiting...
