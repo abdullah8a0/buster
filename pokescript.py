@@ -68,7 +68,7 @@ def pull_repo():
     LOG.write(message)
     if is_error:
         LOG.write("Exiting...\n")
-    return is_error
+    return not is_error
 
 
 def run_cascade():
@@ -112,12 +112,7 @@ def add_log():
 
 def main():
     if pull_repo():
-        LOG.close()
-        return
-    if run_cascade():
-        LOG.close()
-        return
-    LOG.write("Done!\n")
+        run_cascade()
     LOG.close()
     add_log()
     os.system("git commit -m \"Updated log.txt\"")
