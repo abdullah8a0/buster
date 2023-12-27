@@ -10,3 +10,22 @@ Wed Dec 27 05:44:03 PM EST 2023
 Already up to date.
 Hello World!
 Done!
+--------------------
+Wed Dec 27 05:48:59 PM EST 2023
+--------------------
+Error: an error occurred while updating the repo
+b'Updating f4a6d35..4700355\n'Exiting...
+--------------------
+Wed Dec 27 05:50:17 PM EST 2023
+--------------------
+Error: an error occurred while updating the repo
+b'Updating f4a6d35..c263f6c\n'Exiting...
+--------------------
+Wed Dec 27 05:51:18 PM EST 2023
+--------------------
+Updating f4a6d35..c263f6c
+Fast-forward
+ pokescript.py | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+Hello World!
+Done!
