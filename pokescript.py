@@ -121,6 +121,7 @@ def main():
     LOG.close()
     add_log()
     os.system("git commit -m \"Updated log.txt\"")
+    os.system("git push")
 
 
 if __name__ == "__main__":
