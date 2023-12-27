@@ -29,3 +29,20 @@ Fast-forward
  1 file changed, 13 insertions(+), 5 deletions(-)
 Hello World!
 Done!
+--------------------
+Wed Dec 27 05:51:39 PM EST 2023
+--------------------
+Already up to date.
+Error: an error occurred while running the cascade
+b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\n'Exiting...
+--------------------
+Wed Dec 27 05:54:30 PM EST 2023
+--------------------
+Error: an error occurred while updating the repo
+b''Exiting...
+--------------------
+Wed Dec 27 05:55:34 PM EST 2023
+--------------------
+Already up to date.
+Error: an error occurred while running the cascade
+b'make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\n'Exiting...
