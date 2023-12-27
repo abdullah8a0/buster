@@ -6,7 +6,7 @@ import re
 import argparse
 import subprocess
 
-CASCADE_COMMAND = "cd buster; make && sudo insmod buster.ko || sudo dmesg > dump/dump-$(date +%d-%H-%M-%S).out"
+CASCADE_COMMAND = "cd buster; make && { echo \"iommu!!!!!\" | sudo insmod buster.ko} || {echo \"iommu\" | sudo dmesg }> dump/dump-$(date +%d-%H-%M-%S).out"
 
 STDOUT_FILE = "log.txt"
 
@@ -86,7 +86,7 @@ def run_cascade():
         message += str(e.output)
 
     # check for added files
-    files = subprocess.check_output(["git", "status", "--porcelain"]) 
+    files = subprocess.check_output(["git", "status", "--porcelain"])
     files = files.decode("utf-8")
     files = files.split("\n")
     files = [f for f in files if f != ""]
