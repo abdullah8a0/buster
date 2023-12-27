@@ -79,6 +79,7 @@ def run_cascade():
     is_error = False
     message = ""
     try:
+        print(f"Running command: {CASCADE_COMMAND}")
         message = subprocess.check_output(
             CASCADE_COMMAND, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
