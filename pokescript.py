@@ -6,7 +6,7 @@ import re
 import argparse
 import subprocess
 
-CASCADE_COMMAND = "echo 'Hello World!'"
+CASCADE_COMMAND = "cd buster; make && sudo insmod buster.ko || sudo dmesg > dump/dump-$(date +%d-%H-%M-%S).out"
 
 STDOUT_FILE = "log.txt"
 
@@ -23,10 +23,11 @@ The steps are as follows:
 All error output is redirected to STDOUT_FILE
 """
 
+
 class Log:
     def __init__(self):
         self.terminal = sys.stdout
-        
+
         datetime = subprocess.check_output(["date"])
         with open(STDOUT_FILE, "a") as f:
             f.write("--------------------\n")
@@ -40,12 +41,16 @@ class Log:
             message = message.decode("utf-8")
         self.terminal.write(message)
         self.log.write(message)
+
     def flush(self):
         pass
+
     def close(self):
         self.log.close()
 
+
 LOG = Log()
+
 
 def pull_repo():
     """
@@ -65,6 +70,7 @@ def pull_repo():
         LOG.write("Exiting...\n")
     return is_error
 
+
 def run_cascade():
     """
     Runs the cascade command and appends the output to log.txt
@@ -83,6 +89,7 @@ def run_cascade():
         LOG.write("Exiting...\n")
     return is_error
 
+
 def add_log():
     """
     Adds the log file to the repo
@@ -98,9 +105,8 @@ def add_log():
         message += str(e.output)
 
     if is_error:
-        with open(STDOUT_FILE, "a") as f:
-            f.write(message)
-        LOG.write("Exiting...\n")
+        print("FATAL ERROR: could not add log file to repo")
+        print(message)
     return is_error
 
 
@@ -115,6 +121,7 @@ def main():
     LOG.close()
     add_log()
     os.system("git commit -m \"Updated log.txt\"")
+
 
 if __name__ == "__main__":
     main()
