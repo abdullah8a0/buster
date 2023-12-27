@@ -36,6 +36,15 @@
     printk(BUSTER_INFO #x " = %s\n", bin); \
 } while (0)
 
+#define VERIFY(x) do { \
+    if (!(x)) { \
+        printk(BUSTER_ERR "Zero value for " #x "\n"); \
+        return -1; \
+    } \
+} while (0)
+
+#define GET_MASK(start,end) ((~0ULL << (start)) & (~0ULL >> (64 - (end) - 1)))
+
 
 extern struct dentry *dump_file, *dump_dir;
 extern char log_buffer[LOG_SIZE];
@@ -58,5 +67,6 @@ typedef size_t st;
 void* mymalloc(st size);
 void log_range(u64 start_ptr, u64 limit_ptr, char* msg);
 u64 get_mapping(u64 addr, st size);
+u64 is_repeat_in(u64 val, u64* arr, st size);
 /* void setup_log(void); */ 
 /* int buster_log(char *msg, int len); */

@@ -93,7 +93,7 @@ u64 get_iommu_regs(u64 cap_ptr) {
     return 0;
   }
 
-  mmio_base = get_mapping(base_addr, 4096);
+  mmio_base = get_mapping(base_addr, 512 * 1024);
   printk(BUSTER_INFO "IOMMU VA: 0x%016llx <- 0x%016llx\n", mmio_base,
          base_addr);
 
@@ -102,7 +102,7 @@ u64 get_iommu_regs(u64 cap_ptr) {
     return 0;
   }
 
-  log_range(mmio_base, mmio_base + 4096, "IOMMU BASE");
+  log_range(mmio_base, mmio_base + 4 * 4096, "IOMMU BASE");
 
   return mmio_base;
 }
@@ -141,18 +141,28 @@ void bust_open(u64 arg1, u64 arg2) {
   u64 comTblSize = comBaseReg >> 56;
   comTblSize = (1 << comTblSize) * 4096;
 
-  u64 comTblBase = comBaseReg & ((1ull << 51) - 1);
+  u64 comTblBase = comBaseReg & GET_MASK(12, 51);
 
   printk(BUSTER_INFO "comBaseReg: 0x%016llx\n", comBaseReg);
 
   u64 comTblBase_v = (u64)phys_to_virt(comTblBase);
   printk(BUSTER_INFO "comTblBase_v: 0x%016llx <- 0x%016llx\n", comTblBase_v,
          comTblBase);
-  log_range(comTblBase_v, comTblBase_v + 48 * 4096, "COM TBL");
 
-#if 0
+  u64 comTailReg = *((u64 *)mmio_regs + (0x2008 / 8));
+  // ptr = [18:4]
+  u64 comTailPtr = comTailReg & GET_MASK(4, 18);
 
-  u64 eventLogBaseReg = *((u64*)mmio_regs + 2);
+  u64 comHeadReg = *((u64 *)mmio_regs + (0x2000 / 8));
+  // ptr = [18:4]
+  u64 comHeadPtr = comHeadReg & GET_MASK(4, 18);
+
+  log_range(comTblBase_v + comHeadPtr - 16 * 256, comTblBase_v + comTailPtr,
+            "COM TBL");
+
+#if 1
+
+  u64 eventLogBaseReg = *((u64 *)mmio_regs + 2);
   // len = [59:56] // power of 2 increment, 1000 is 256 entries, 4kb
   // base = [51:12] // 4K aligned,
 
@@ -162,12 +172,22 @@ void bust_open(u64 arg1, u64 arg2) {
   u64 eventLogBase = eventLogBaseReg & ((1ull << 51) - 1);
 
   printk(BUSTER_INFO "eventLogBaseReg: 0x%016llx\n", eventLogBaseReg);
-  
-  u64 eventLogBase_v = (u64)phys_to_virt(eventLogBase);
-  printk(BUSTER_INFO "eventLogBase_v: 0x%016llx <- 0x%016llx\n", eventLogBase_v, eventLogBase);
-  /* log_range(eventLogBase_v, eventLogBase_v + 4*4096, "EVENT LOG"); */
-#endif
 
+  u64 eventLogBase_v = (u64)phys_to_virt(eventLogBase);
+  printk(BUSTER_INFO "eventLogBase_v: 0x%016llx <- 0x%016llx\n", eventLogBase_v,
+         eventLogBase);
+
+  u64 eventLogTailReg = *((u64 *)mmio_regs + (0x2018 / 8));
+  // ptr = [18:4]
+  u64 eventLogTailPtr = eventLogTailReg & GET_MASK(4, 18);
+
+  u64 eventLogHeadReg = *((u64 *)mmio_regs + (0x2010 / 8));
+  // ptr = [18:4]
+  u64 eventLogHeadPtr = eventLogHeadReg & GET_MASK(4, 18);
+
+  log_range(eventLogBase_v + eventLogHeadPtr - 16 * 256,
+            eventLogBase_v + eventLogTailPtr, "EVNT LOG");
+#endif
 }
 
 #define NMIOMMU 4
@@ -182,7 +202,8 @@ static int __init buster_ini(void) {
   busnums[2] = 0x80;
   busnums[3] = 0xc0;
 
-  /* dump_to_user(buf, msg, 64); */
+  u64 seen_iommu_regs[NMIOMMU * 4] = {0};
+  st seen_iommu_regs_idx = 0;
 
   for (int i = 0; i < NMIOMMU; i++) {
     if ((cap_ptr = get_cap_space(busnums[i], 0, 2)) == NULL) {
@@ -191,14 +212,30 @@ static int __init buster_ini(void) {
     }
 
     mmio_base = get_iommu_regs((u64)cap_ptr);
-    if (i == NMIOMMU - 1) 
+
+    if (is_repeat_in(mmio_base, seen_iommu_regs, NMIOMMU * 4))
+      mmio_base = 0;
+    else {
+      seen_iommu_regs[seen_iommu_regs_idx] = mmio_base;
+      seen_iommu_regs_idx++;
       bust_open(mmio_base, 0);
-   do {
+    }
+
+    do { // find all capability blocks
       cap_off = *(u32 *)((u8 *)cap_ptr + 1);
       cap_off &= 0xff;
       cap_ptr = (u32 *)((u8 *)cap_ptr + cap_off);
       mmio_base = get_iommu_regs((u64)cap_ptr);
-      /* bust_open(mmio_base, 0); */
+
+      if (is_repeat_in(mmio_base, seen_iommu_regs,
+                       NMIOMMU * 4)) // print only unique mmio regs
+        mmio_base = 0;
+      else {
+        seen_iommu_regs[seen_iommu_regs_idx] = mmio_base;
+        seen_iommu_regs_idx++;
+        bust_open(mmio_base, 0);
+      }
+
     } while (cap_off != 0x00 && cap_off != 0xff);
   }
 

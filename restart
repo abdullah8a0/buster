@@ -1,0 +1,7 @@
+#!/usr/bin/sh
+
+echo "Do you want to restart your computer? (y/n)"
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo reboot
+fi

@@ -1,2 +1,4 @@
 List pci capability blocks:
-    sudo lspci -vv -xxx | grep '^.0:00\.2 IOMMU' -A 25
+	sudo lspci -vv -xxx | grep '^.0:00\.2 IOMMU' -A 25
+Run pipeline:
+	make && sudo insmod buster.ko || sudo dmesg > dump/dump-$(date +%d-%H-%M-%S).out

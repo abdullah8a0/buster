@@ -49,6 +49,11 @@ void log_range(u64 start_ptr, u64 limit_ptr, char *msg) {
     return;
   }
 
+  if (start_ptr > limit_ptr) {
+    printk(BUSTER_INFO "err:start > limit");
+    return;
+  }
+
   if (limit_ptr - start_ptr < BLOCK_BYTES) {
     printk(BUSTER_INFO "BEGIN.%lx.%llx.%s\n", log_id, start_ptr, msg);
     for (u64 *ptr = (u64 *)start_ptr; ptr < (u64 *)limit_ptr; ptr++) {
@@ -61,10 +66,6 @@ void log_range(u64 start_ptr, u64 limit_ptr, char *msg) {
     return;
   }
 
-  if (start_ptr > limit_ptr) {
-    printk(BUSTER_INFO "err:start > limit");
-    return;
-  }
 
   if (start_ptr % 8 != 0) {
     printk(BUSTER_INFO "err:start not aligned");
@@ -84,7 +85,7 @@ void log_range(u64 start_ptr, u64 limit_ptr, char *msg) {
   printk(BUSTER_INFO "BEGIN.%lx.%llx.%s\n", log_id, start_ptr, msg);
   u64 *ptr;
   for (ptr = (u64 *)start_ptr + BLOCK_WORDS;
-       ptr + BLOCK_WORDS < (u64 *)limit_ptr; ptr += BLOCK_WORDS) {
+       ptr + BLOCK_WORDS <= (u64 *)limit_ptr; ptr += BLOCK_WORDS) {
 
     bool repeat = true;
     for (int i = 0; i < BLOCK_WORDS; i++) {
@@ -158,3 +159,14 @@ u64 get_mapping(u64 addr, st size) {
 
   return ptr;
 }
+
+
+u64 is_repeat_in(u64 val, u64* arr, st size){
+  for (st i = 0; i < size; i++){
+    if (arr[i] == val){
+      return 1;
+    }
+  }
+  return 0;
+}
+
