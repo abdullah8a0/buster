@@ -100,3 +100,12 @@ Error: an error occurred while running the cascade
 b"make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules\nmake[1]: Entering directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'\nmake[1]: Leaving directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'\nsudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper\nsudo: a password is required\nsudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper\nsudo: a password is required\n"Log: the following files were added to the repo:
 buster/dump/dump-27-18-43-44.out
 Exiting...
+--------------------
+Wed Dec 27 06:45:31 PM EST 2023
+--------------------
+Updating a495e27..59f45e0
+Fast-forward
+ pokescript.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+Error: an error occurred while running the cascade
+b'/bin/sh: 1: Syntax error: end of file unexpected (expecting "}")\n'Exiting...
