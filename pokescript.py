@@ -60,6 +60,7 @@ def pull_repo():
     message = ""
     try:
         message = subprocess.check_output(["git", "pull"])
+        message = message.decode("utf-8")
     except subprocess.CalledProcessError as e:
         is_error = True
         message = "Error: an error occurred while updating the repo\n"
