@@ -82,6 +82,7 @@ def run_cascade():
         print(f"Running command: {CASCADE_COMMAND}")
         message = subprocess.check_output(
             CASCADE_COMMAND, shell=True, stderr=subprocess.STDOUT)
+        message = message.decode("utf-8")
     except subprocess.CalledProcessError as e:
         is_error = True
         message = "Error: an error occurred while running the cascade\n"
