@@ -129,3 +129,39 @@ Error: an error occurred while running the cascade
 b'/bin/sh: 1: Syntax error: end of file unexpected (expecting "}")\n'Log: the following files were added to the repo:
 buster/dump/dump-27-18-52-33.out
 Exiting...
+--------------------
+Wed Dec 27 06:58:55 PM EST 2023
+--------------------
+Updating f9ac886..caf23ba
+Fast-forward
+ pokescript.py | 1 +
+ 1 file changed, 1 insertion(+)
+--------------------
+Wed Dec 27 06:59:50 PM EST 2023
+--------------------
+Already up to date.
+--------------------
+Wed Dec 27 07:00:40 PM EST 2023
+--------------------
+Updating caf23ba..3939e5f
+Fast-forward
+ pokescript.py | 1 +
+ 1 file changed, 1 insertion(+)
+--------------------
+Wed Dec 27 07:01:11 PM EST 2023
+--------------------
+Updating 3939e5f..828716d
+Fast-forward
+ pokescript.py | 1 +
+ 1 file changed, 1 insertion(+)
+make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules
+make[1]: Entering directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'
+make[1]: Leaving directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'
+[sudo] password for abdullah: insmod: ERROR: could not insert module buster.ko: Operation not permitted
+Log: the following files were added to the repo:
+buster/dump/dump-27-18-57-09.out
+buster/dump/dump-27-18-57-46.out
+buster/dump/dump-27-18-58-56.out
+buster/dump/dump-27-18-59-51.out
+buster/dump/dump-27-19-00-41.out
+buster/dump/dump-27-19-01-13.out
