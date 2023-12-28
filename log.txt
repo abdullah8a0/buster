@@ -260,3 +260,13 @@ make[1]: Leaving directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a0
 [sudo] password for abdullah: insmod: ERROR: could not insert module buster.ko: Operation not permitted
 Log: the following files were added to the repo:
 buster/dump/dump-27-20-29-14.out
+--------------------
+Wed Dec 27 08:31:55 PM EST 2023
+--------------------
+Already up to date.
+make -C /lib/modules/6.6.0-rc1-snp-host-5a170ce1a082/build M=/home/abdullah/iommu/buster modules
+make[1]: Entering directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'
+make[1]: Leaving directory '/usr/src/linux-headers-6.6.0-rc1-snp-host-5a170ce1a082'
+[sudo] password for abdullah: insmod: ERROR: could not insert module buster.ko: Operation not permitted
+Log: the following files were added to the repo:
+buster/dump/dump-27-20-31-56.out
