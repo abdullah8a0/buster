@@ -139,7 +139,7 @@ def buster():
 
 
 def cuda():
-    pass
+    print("Running cuda")
 
 
 def main():
