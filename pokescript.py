@@ -57,6 +57,7 @@ def pull_repo():
     is_error = False
     message = ""
     try:
+        subprocess.check_output(["git", "fetch"])
         message = subprocess.check_output(["git", "pull"])
         message = message.decode("utf-8")
     except subprocess.CalledProcessError as e:
@@ -134,24 +135,23 @@ def add_log():
 
 
 def buster():
-    if pull_repo():
-        run_cascade()
+    run_cascade()
 
 
 def cuda():
-    pass
+    print("Running cuda")
 
 
 def main():
     args = sys.argv[1:]
-    if len(args) == 0:
-        buster()
-    elif args[0] == "cuda":
-        cuda()
-    else:
-        print("Error: invalid argument")
-        print("Usage: python3 pokescript.py [cuda]")
-
+    if pull_repo():
+        if len(args) == 0:
+            buster()
+        elif args[0] == "cuda":
+            cuda()
+        else:
+            print("Error: invalid argument")
+            print("Usage: python3 pokescript.py [cuda]")
     LOG.close()
     add_log()
     os.system("git commit -m \"Updated log.txt\"")
