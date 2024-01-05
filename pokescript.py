@@ -57,6 +57,7 @@ def pull_repo():
     is_error = False
     message = ""
     try:
+        subprocess.check_output(["git", "fetch"])
         message = subprocess.check_output(["git", "pull"])
         message = message.decode("utf-8")
     except subprocess.CalledProcessError as e:
