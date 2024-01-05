@@ -2,8 +2,6 @@
 
 import sys
 import os
-import re
-import argparse
 import subprocess
 
 CASCADE_COMMAND = "cd buster || exit; make && { echo 'iommu!!!!!' | sudo -S insmod buster.ko; } || { echo 'iommu!!!!!' | sudo -S dmesg; } > dump/dump-$(date +%d-%H-%M-%S).out"
@@ -135,9 +133,25 @@ def add_log():
     return is_error
 
 
-def main():
+def buster():
     if pull_repo():
         run_cascade()
+
+
+def cuda():
+    pass
+
+
+def main():
+    args = sys.argv[1:]
+    if len(args) == 0:
+        buster()
+    elif args[0] == "cuda":
+        cuda()
+    else:
+        print("Error: invalid argument")
+        print("Usage: python3 pokescript.py [cuda]")
+
     LOG.close()
     add_log()
     os.system("git commit -m \"Updated log.txt\"")
